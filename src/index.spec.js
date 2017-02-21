@@ -42,9 +42,9 @@ describe('IsomorphicLoader', () => {
 
       render(ReactDOMServer.renderToString)
 
-      IsomorphicLoader.prototype.componentDidMount.should.not.have.been.called.once
+      IsomorphicLoader.prototype.componentDidMount.should.not.have.been.called()
       IsomorphicLoader.prototype.render.should.have.been.called.once
-      Child.prototype.render.should.not.have.been.called.once
+      Child.prototype.render.should.not.have.been.called()
     })
 
     it('should call render child component once and library param should be null with strict at false', () => {
@@ -54,7 +54,7 @@ describe('IsomorphicLoader', () => {
         library.should.be.equals(null)
       })
 
-      IsomorphicLoader.prototype.componentDidMount.should.not.have.been.called.once
+      IsomorphicLoader.prototype.componentDidMount.should.not.have.been.called()
       IsomorphicLoader.prototype.render.should.have.been.called.once
       Child.prototype.render.should.have.been.called.once
     })

@@ -37,7 +37,7 @@ const render = (renderer, strict = true, callback) => renderer(
 
 describe('IsomorphicLoader', () => {
   describe('Serverside', () => {
-    it('should call render function once but not componentDidMount function', () => {
+    it('should not load the library and children aren\'t rendered', () => {
       initSpies()
 
       render(ReactDOMServer.renderToString)
@@ -47,7 +47,7 @@ describe('IsomorphicLoader', () => {
       Child.prototype.render.should.not.have.been.called()
     })
 
-    it('should call render child component once and library param should be null with strict at false', () => {
+    it('should not load the library and children are rendered', () => {
       initSpies()
 
       render(ReactDOMServer.renderToString, false, library => {
@@ -60,7 +60,7 @@ describe('IsomorphicLoader', () => {
     })
   })
   describe('Browerside', () => {
-    it('should call render function twice and componentDidMount function once of both component', () => {
+    it('should load the library and render children when the library is loaded', () => {
       initSpies()
 
       render(mount, undefined, library => {
@@ -72,7 +72,7 @@ describe('IsomorphicLoader', () => {
       Child.prototype.render.should.have.been.called.once
     })
 
-    it('should call render child component twice and library param should be null on first render with strict at false', () => {
+    it('should load the library and render children before the library is loaded', () => {
       initSpies()
 
       render(mount, false, library => {

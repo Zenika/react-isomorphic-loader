@@ -1,30 +1,56 @@
 import { Component, PropTypes } from 'react'
 
+const getTypeOf = (something) => {
+  const getType = {}
+  return something && getType.toString.call(something)
+}
+
+const is = typeString => varToCheck => {
+  const type = getTypeOf(varToCheck)
+  return type && type === typeString
+}
+
+const isString = is('[object String]')
+
+const isArray = is('[object Array]')
+
 class IsomorphicLoader extends Component {
 
-  propTypes = {
+  static propTypes = {
     strict: PropTypes.bool,
-    library: PropTypes.string.isRequired,
+    libraries: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.array,
+    ]).isRequired,
     children: PropTypes.func.isRequired,
   }
 
   state = {
-    library: null,
+    libraries: null,
   }
 
   componentDidMount() {
-    // eslint-disable-next-line global-require, react/no-did-mount-set-state
-    this.setState({ library: require(this.props.library) })
+    const { libraries } = this.props
+
+    if (isString(libraries)) {
+      // eslint-disable-next-line global-require, react/no-did-mount-set-state
+      this.setState({ libraries: [require(libraries)] })
+    }
+
+    if (isArray(libraries)) {
+      // eslint-disable-next-line global-require, react/no-did-mount-set-state
+      this.setState({ libraries: libraries.map(l => require(l)) })
+    }
   }
 
   render() {
     const { children, strict = true } = this.props
-    const { library } = this.state
+    const { libraries } = this.state
 
     if (strict) {
-      return library && children(library)
+      return libraries && children(...libraries)
     }
-    return library ? children(library) : children()
+    return libraries ? children(...libraries) : children()
   }
 
 }

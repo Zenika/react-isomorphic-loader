@@ -26,21 +26,34 @@ const initSpies = () => {
   spy.on(Child.prototype, 'render')
 }
 
-const render = (renderer, strict = true, callback) => renderer(
-  <IsomorphicLoader library="react" strict={strict}>
-    {lib => {
-      if (callback && callback === '[object Function]') callback(lib)
+const render = (libraries, renderer, strict = true, callback) => renderer(
+  <IsomorphicLoader libraries={libraries} strict={strict}>
+    {(...args) => {
+      if (callback && callback === '[object Function]') callback(args)
       return <Child />
     }}
   </IsomorphicLoader>
 )
 
 describe('IsomorphicLoader', () => {
+  describe('Inputs', () => {
+    it('should support one library as string', () => {
+      render('react', mount, undefined, library => {
+        library.should.be.equals(React)
+      })
+    })
+    it('should support multiple libraries as array', () => {
+      render(['react', 'react-dom/server'], mount, undefined, (library1, library2) => {
+        library1.should.be.equals(React)
+        library2.should.be.equals(ReactDOMServer)
+      })
+    })
+  })
   describe('Serverside', () => {
     it('should not load the library and children aren\'t rendered', () => {
       initSpies()
 
-      render(ReactDOMServer.renderToString)
+      render('react', ReactDOMServer.renderToString)
 
       IsomorphicLoader.prototype.componentDidMount.should.not.have.been.called()
       IsomorphicLoader.prototype.render.should.have.been.called.once
@@ -50,7 +63,7 @@ describe('IsomorphicLoader', () => {
     it('should not load the library and children are rendered', () => {
       initSpies()
 
-      render(ReactDOMServer.renderToString, false, library => {
+      render('react', ReactDOMServer.renderToString, false, library => {
         library.should.be.equals(null)
       })
 
@@ -63,7 +76,7 @@ describe('IsomorphicLoader', () => {
     it('should load the library and render children when the library is loaded', () => {
       initSpies()
 
-      render(mount, undefined, library => {
+      render('react', mount, undefined, library => {
         library.should.be.equals(React)
       })
 
@@ -75,7 +88,7 @@ describe('IsomorphicLoader', () => {
     it('should load the library and render children before the library is loaded', () => {
       initSpies()
 
-      render(mount, false, library => {
+      render('react', mount, false, library => {
         library.should.be.equals(null)
       })
 
